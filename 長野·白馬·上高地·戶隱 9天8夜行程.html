@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>長野·白馬·上高地·戶隱 9天8夜秋色秘境</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+body{background:#FDFBF7;color:#2C3E35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif}
+.tab-active{background:#2D4A3E!important;color:#fff!important}
+.card-bg{background:#fff;border:1px solid #EAE5D9}
+.accent-green{color:#2D4A3E}
+.tl{border-left:2px solid #CFE0D6;margin-left:6px}
+.tl .row{position:relative;padding:6px 0 10px 14px}
+.tl .row:before{content:"";position:absolute;left:-6px;top:12px;width:10px;height:10px;border-radius:50%;background:#2D4A3E}
+.tl .row.free:before{background:#C9B98A}
+a.lk{color:#1d5fd1;text-decoration:underline;font-size:11px;margin-right:8px;white-space:nowrap}
+</style>
+</head>
+<body class="min-h-screen pb-12">
+<header class="bg-[#2D4A3E] text-white py-6 px-4 shadow-md text-center">
+  <h1 class="text-2xl font-bold tracking-wide">長野 · 白馬 · 上高地 · 戶隱</h1>
+  <p class="text-sm text-[#D4E0D8] mt-1">9天8夜秋季自然療癒與健行之旅 (10/31 - 11/8)</p>
+</header>
+
+<nav class="max-w-4xl mx-auto px-4 mt-4">
+  <div class="flex overflow-x-auto space-x-2 pb-2 border-b border-[#EAE5D9]">
+    <button onclick="switchTab('itinerary')" id="btn-itinerary" class="tab-active px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap bg-white text-[#2D4A3E] shadow-sm">行程時間軸</button>
+    <button onclick="switchTab('tickets')" id="btn-tickets" class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap bg-white text-[#2D4A3E] shadow-sm">票券與住宿</button>
+    <button onclick="switchTab('food')" id="btn-food" class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap bg-white text-[#2D4A3E] shadow-sm">美食</button>
+    <button onclick="switchTab('expenses')" id="btn-expenses" class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap bg-white text-[#2D4A3E] shadow-sm">記帳與換算</button>
+    <button onclick="switchTab('checklist')" id="btn-checklist" class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap bg-white text-[#2D4A3E] shadow-sm">裝備與注意事項</button>
+  </div>
+</nav>
+
+<main class="max-w-4xl mx-auto px-4 mt-6">
+  <section id="tab-itinerary" class="space-y-4">
+    <div id="day-filters" class="flex overflow-x-auto space-x-2 pb-2"></div>
+    <div id="itinerary-cards" class="space-y-4"></div>
+  </section>
+
+  <section id="tab-tickets" class="hidden space-y-4">
+    <h2 class="text-xl font-bold accent-green">🎟️ 已預訂票券與重要憑證</h2>
+    <div id="ticket-list" class="grid gap-4 md:grid-cols-2"></div>
+    <h2 class="text-xl font-bold accent-green mt-6">🏨 全程住宿資訊</h2>
+    <div id="hotel-list" class="grid gap-4 md:grid-cols-2"></div>
+  </section>
+
+  <section id="tab-food" class="hidden space-y-4">
+    <h2 class="text-xl font-bold accent-green">🍜 在地特色美食（點擊可開地圖）</h2>
+    <div id="food-list" class="space-y-3"></div>
+  </section>
+
+  <section id="tab-expenses" class="hidden space-y-4">
+    <h2 class="text-xl font-bold accent-green">💱 匯率換算與記帳本</h2>
+    <div class="card-bg p-4 rounded-xl shadow-sm space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-sm">匯率換算 (JPY ⇄ TWD)</h3>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500">日幣 (JPY)</label><input type="number" id="calc-jpy" oninput="convertCurrency('jpy')" class="w-full border rounded-lg p-2 mt-1 text-sm" placeholder="輸入日幣"></div>
+        <div><label class="text-xs text-gray-500">新台幣 (TWD)</label><input type="number" id="calc-twd" oninput="convertCurrency('twd')" class="w-full border rounded-lg p-2 mt-1 text-sm" placeholder="台幣"></div>
+      </div>
+      <p id="rate-status" class="text-xs text-gray-500">目前匯率基準：0.209 (固定參考匯率，實際以刷卡或換匯當日為準)</p>
+    </div>
+    <div class="card-bg p-4 rounded-xl shadow-sm space-y-3">
+      <h3 class="font-bold text-sm">➕ 新增旅程花費</h3>
+      <input type="text" id="exp-title" placeholder="項目名稱 (例如: 午餐 蕎麥麵)" class="w-full border rounded-lg p-2 text-sm">
+      <div class="grid grid-cols-2 gap-3">
+        <input type="number" id="exp-amount" placeholder="金額 (JPY)" class="border rounded-lg p-2 text-sm">
+        <select id="exp-category" class="border rounded-lg p-2 text-sm">
+          <option>餐飲美食</option><option>交通移動</option><option>門票體驗</option><option>購物伴手禮</option><option>其他雜費</option>
+        </select>
+      </div>
+      <button onclick="addExpense()" class="w-full bg-[#2D4A3E] text-white py-2 rounded-lg text-sm font-medium">記錄花費</button>
+    </div>
+    <div class="card-bg p-4 rounded-xl shadow-sm">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-sm">總花費統計</h3>
+        <span id="total-spent" class="font-bold text-lg text-[#2D4A3E]">¥0 (NT$0)</span>
+      </div>
+      <div id="expense-list" class="divide-y mt-2"></div>
+    </div>
+  </section>
+
+  <section id="tab-checklist" class="hidden space-y-4">
+    <h2 class="text-xl font-bold accent-green">🎒 裝備與注意事項</h2>
+    <div class="card-bg p-4 rounded-xl shadow-sm space-y-2">
+      <h3 class="font-bold text-sm text-red-700">❄️ 寒流與降雪提醒（白馬山頂 / 上高地約 0°C ~ 5°C）</h3>
+      <ul class="text-xs space-y-1 text-gray-700 list-disc pl-4">
+        <li>影響最大：Day 3 八方池、Day 6 上高地。山頂與步道可能結霜、薄冰或殘雪；纜車上方步道若遇積雪可能管制，依現場指示，走到觀景台即可。</li>
+        <li>影響較小：Day 4 白馬平地、Day 5 松本、Day 7 戶隱（平地約 5~12°C，戶隱奧社參道清晨濕滑，注意防滑）。</li>
+        <li>洋蔥式穿搭：發熱衣 + 抓絨層 + 防風防水羽絨外套；毛帽、防風手套、圍巾、暖暖包必備。</li>
+        <li>鞋具：防滑防水登山鞋或健行鞋。</li>
+      </ul>
+    </div>
+    <div class="card-bg p-4 rounded-xl shadow-sm space-y-2">
+      <h3 class="font-bold text-sm">📋 隨身攜帶檢查表</h3>
+      <div class="space-y-2 text-sm">
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>護照與機票電子憑證</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>Suica / PASMO 數位或實體卡 (加值確認)</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>日幣現鈔與信用卡 (海外回饋)</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>行動電源與充電線</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>個人常備藥品與保養護唇膏</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"> <span>預約號截圖（新幹線、上高地巴士、寄物）</span></label>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+let currentRate = 0.209;
+let expenses = [];
+try { expenses = JSON.parse(localStorage.getItem('trip_expenses')) || []; } catch(e) {}
+function save(){ try{ localStorage.setItem('trip_expenses', JSON.stringify(expenses)); }catch(e){} }
+
+const enc = encodeURIComponent;
+const M = q => ['📍地圖','https://www.google.com/maps/search/?api=1&query='+enc(q)];
+const D = (a,b) => ['🚆查班次','https://www.google.com/maps/dir/?api=1&origin='+enc(a)+'&destination='+enc(b)+'&travelmode=transit'];
+const ALP_HK = ['🔗 Alpico 長野-白馬時刻','https://visit-nagano.alpico.co.jp/zh-hant/timetable/hakuba-nagano-green#ticket-counter'];
+const ALP_TG = ['🔗 長野-戶隱巴士預約','https://visit-nagano.alpico.co.jp/zh-hant/timetable/nagano-togakushi-green#ticket-counter'];
+const TSUGA = ['🔗 三山免費接駁資訊','https://www.tsugaike.gr.jp/archives/15971'];
+const SHINANO = ['🔗 信濃鐵道時刻表 PDF','https://www.shinanorailway.co.jp/rail-info/time-table/docs/20260314_time_table.pdf'];
+const CLOAK = ['🔗 ecbo cloak 預約','https://cloak.ecbo.io/zh-TW/spaces/e4446592-19eb-46b4-a596-99e846aafb39'];
+
+// row: [時間, 項目, 交通/地點, 備註, 連結[], 類型(可省略: 'free' = 彈性/建議時間)]
+const days = [
+{ day:1, date:"10/31 (週六)", title:"抵達東京 ➔ 根津 Check-in ➔ 上野購物",
+  hotel:{n:"Hotel Graphy Nezu (根津)", r:"Agoda 訂單 1783130883", a:"台東區池之端 4-5-10"},
+  rows:[
+   ["07:00 ➔ 11:25","高雄 KHH ➔ 成田 NRT","長榮航空 BR108","抵達後入境、領行李",[]],
+   ["約 12:30 起","成田機場 ➔ 上野 / 根津","京成電鐵（Skyliner 或 Access 特急）","建議時段，請以當日實際班次為準",[D('成田機場','上野站')],"free"],
+   ["下午","Hotel Graphy Nezu Check-in","根津站步行","可先寄放行李",[M('Hotel Graphy Nezu')],"free"],
+   ["午後 ➔ 晚上","上野採買 / 晚餐","步行或地鐵","阿美橫丁、上野車站周邊",[M('上野 阿美橫丁')],"free"]
+  ]},
+{ day:2, date:"11/1 (週日)", title:"東京 ➡️ 長野 ➡️ 白馬 (岩岳絕景咖啡)",
+  hotel:{n:"信州八方溫泉 白馬溫泉旅館 (Shirouma So)", r:"樂天 ID 21315099394939（含早，$8,600）", a:"長野縣北安曇郡白馬村八方 5004"},
+  rows:[
+   ["05:40","飯店 Check-out ➔ 上野站","計程車（GO / DiDi）","車程約 5 分鐘",[M('上野站')]],
+   ["06:22 ➔ 07:36","上野 ➔ 長野","北陸新幹線 Kagayaki 501 號（已訂）","上野站 20 號月台，全車指定席。Klook KQE870934，取票碼 31362365217521218，至 JR 售票機掃 QR 取 2 張實體票",[]],
+   ["07:36 ➔ 08:20","長野站轉乘空檔","長野站東口","買早餐、上洗手間",[],"free"],
+   ["08:20 ➔ 09:35","長野站東口 ➔ 白馬八方總站","Alpico 高原特急巴士","免預約、現場排隊，一樓 26 號月台，可刷 IC 卡。⚠️ 8:20 後下一班為 09:50",[ALP_HK,M('長野駅東口 バスターミナル')]],
+   ["09:35 ➔ 10:10","八方總站 ➔ 旅館寄放行李","步行 5–8 分鐘","",[M('白馬温泉旅館 白馬村八方5004')]],
+   ["10:21 或 10:55","八方總站 ➔ 岩岳纜車口","三山免費巡迴接駁巴士","憑當日岩岳纜車票免費搭乘，需搭上這兩班之一",[TSUGA,M('白馬岩岳マウンテンリゾート')]],
+   ["15:35 或 17:30","岩岳 ➔ 八方總站","Alpico 路線公車","15:35 之後最後一班為 17:30，可刷 IC 卡；錯過可叫計程車約 ¥1,500",[ALP_HK]],
+   ["晚上","晚餐：白馬在地美食","步行","詳見「美食」分頁",[M('白馬村 蕎麥 整理')]]
+  ]},
+{ day:3, date:"11/2 (週一)", title:"白馬八方池 (天空之鏡) ➔ 松川河畔散策",
+  hotel:{n:"白馬溫泉旅館（連住第 2 晚）", r:"樂天 ID 21315099394939", a:"長野縣北安曇郡白馬村八方 5004"},
+  rows:[
+   ["早上","旅館早餐 ➔ 八方纜車站","步行","纜車首班與營運時間以官網當日公告為準",[['🔗 八方尾根官網','https://www.happo-one.jp/'],M('八方アルペンライン ゴンドラリフト')],"free"],
+   ["上午","八方纜車（三段）➔ 健行八方池","八方阿爾卑斯線","⚠️ 山頂偏冷微雪，備手套與防滑鞋；積雪時依現場指示走到觀景台",[M('八方池')],"free"],
+   ["下午","纜車下山 ➔ 白馬大橋、松川河畔","步行","欣賞松川河畔紅葉",[M('白馬大橋')],"free"],
+   ["晚上","晚餐 / 泡溫泉","旅館周邊","",[M('白馬村 深山 ミヤマ')],"free"]
+  ]},
+{ day:4, date:"11/3 (週二·國定假日)", title:"白馬深度遊：大出公園 ➔ Snow Peak ➔ 青木湖",
+  hotel:{n:"白馬溫泉旅館（連住第 3 晚）", r:"樂天 ID 21315099394939", a:"長野縣北安曇郡白馬村八方 5004"},
+  rows:[
+   ["上午","大出公園","計程車或巴士","吊橋、姬川與冠雪白馬連峰",[M('大出公園 白馬村')],"free"],
+   ["午前 ➔ 午後","Snow Peak LAND STATION HAKUBA","步行 / 單車","隈研吾設計，露營旗艦店",[M('Snow Peak LAND STATION HAKUBA')],"free"],
+   ["午後","白馬站前租單車 ➔ 青木湖","單車約 40 分鐘","國定假日人潮較多，建議提早出發",[M('白馬駅 レンタサイクル'),D('白馬駅','青木湖')],"free"],
+   ["下午茶","ao LAKESIDE CAFE","青木湖畔","湖畔咖啡，留意日落與氣溫",[M('ao LAKESIDE CAFE 青木湖')],"free"]
+  ]},
+{ day:5, date:"11/4 (週三)", title:"白馬 ➡️ 松本：松本城與特色市區",
+  hotel:{n:"東橫 INN 松本站東口", r:"Booking.com 預訂（11/4–11/5 共 2 晚）", a:"長野縣松本市深志 1-1-1"},
+  rows:[
+   ["上午","旅館 Check-out ➔ JR 白馬站","步行 / 巴士","",[M('JR 白馬駅')],"free"],
+   ["上午 ➔ 中午","JR 白馬站 ➔ JR 松本站","JR 大糸線普通車（刷 IC 卡）","行車時間與轉乘（如信濃大町）請以時刻表為準",[D('白馬駅','松本駅')]],
+   ["抵達後","東橫 INN 松本站東口寄放行李","步行","",[M('東横INN 松本駅お城口')]],
+   ["午後","繩手通 ➔ 中町通土藏街 ➔ 國寶松本城","步行","",[M('縄手通り 松本'),M('中町通り 松本'),M('松本城')],"free"],
+   ["晚上","晚餐（松本）","","可早睡，明早 06:31 搭電車",[M('Hikariya 松本 ヒカリヤ')],"free"]
+  ]},
+{ day:6, date:"11/5 (週四)", title:"上高地大縱走 (明神池) ➔ 返回松本",
+  hotel:{n:"東橫 INN 松本站東口（連住第 2 晚）", r:"Booking.com 預訂", a:"長野縣松本市深志 1-1-1"},
+  rows:[
+   ["06:31","松本站 ➔ 新島々","松本電鐵上高地線","⚠️ 需趕上 07:10 巴士，勿延誤",[D('松本駅','新島々駅')]],
+   ["07:10 ➔ 08:04","新島々 ➔ 大正池","Alpico 巴士（已訂）","予約番号 10212001481｜02 号車｜CHU CHING HUA",[M('新島々駅')]],
+   ["08:04 起","大正池 ➔ 河童橋 ➔ 明神池","步行健行","沿途唐松林與步道，⚠️ 結霜濕滑",[M('大正池'),M('河童橋'),M('明神池')],"free"],
+   ["17:15","上高地巴士總站 ➔ 新島々","Alpico 巴士（已訂）","予約番号 10282000821｜01 号車｜JPY 3,810｜務必提前到站",[M('上高地バスターミナル')]],
+   ["約 18:10 ➔ 19:10","新島々 ➔ 松本站","松本電鐵","約 19:10 抵達松本，回東橫 INN",[D('新島々駅','松本駅')]]
+  ]},
+{ day:7, date:"11/6 (週五)", title:"松本 ➔ 長野(寄物) ➔ 戶隱神社 ➔ 千曲龜屋",
+  hotel:{n:"ホテル亀屋本店 (千曲上山田溫泉，一泊二食)", r:"一休 予約番号 IC1708267979", a:"長野縣千曲市上山田溫泉 1-37-1"},
+  rows:[
+   ["07:10 ➔ 08:09","松本 ➔ 長野","JR 特急 Shinano 1 號","車程 59 分鐘",[D('松本駅','長野駅')]],
+   ["08:09 ➔ 08:30","長野站行李寄放","MIDORI 1F ecbo cloak","預約號 e4446592｜⚠️ 11/5 23:59 前可免費取消/變更，當天不可。出改札搭電扶梯到 1 樓",[CLOAK,M('MIDORI長野 1F 手荷物')]],
+   ["08:50 ➔ 09:55","長野站 ➔ 戶隱奧社入口","Alpico 70 路巴士（全車預約制）","MIDORI 1F 走出即達 7 號月台，奧社入口下車",[ALP_TG,M('戸隠神社 奥社')]],
+   ["09:55 ➔ 15:50","奧社參道、隨神門、鏡池、中社、蕎麥麵","步行至寶光社","午餐推薦渦屋（Uzuraya），晨間注意濕滑",[M('戸隠神社 中社'),M('戸隠そば うずら家')],"free"],
+   ["15:55 ➔ 16:25","寶光社 ➔ 長野站","Alpico 70 路巴士（預約制）","寶光社站牌上車",[ALP_TG,M('戸隠神社 宝光社')]],
+   ["16:25 ➔ 17:10","取行李、前往信濃鐵道月台","MIDORI 1F","",[CLOAK]],
+   ["17:18 ➔ 17:45","長野 ➔ 戶倉","信濃鐵道","車程 27 分鐘，¥600",[SHINANO,D('長野駅','戸倉駅')]],
+   ["17:50 左右","戶倉站 ➔ 龜屋本店","飯店免費預約接駁車","18:00 準時享用溫泉會席晚餐",[M('ホテル亀屋本店 千曲')]]
+  ]},
+{ day:8, date:"11/7 (週六)", title:"長野善光寺 ➔ 返回東京 (西葛西)",
+  hotel:{n:"Grand Hostel LDK Nishikasai (西葛西)", r:"Booking.com 預訂", a:"東京都江戶川區西葛西"},
+  rows:[
+   ["早上","Check-out ➔ 長野（飯店接駁 / 信濃鐵道）","信濃鐵道 戶倉 ➔ 長野","請向飯店確認接駁車時間",[SHINANO,D('戸倉駅','長野駅')],"free"],
+   ["上午","善光寺與表參道","長野站巴士或步行","國寶本堂參拜、仲見世通散策",[M('善光寺')],"free"],
+   ["下午","長野 ➔ 東京站","北陸新幹線（指定席或自由席）","建議事先預約指定席",[D('長野駅','東京駅')]],
+   ["抵達後","東京站 ➔ 大手町 ➔ 西葛西","地下連通道 ➔ 東京 Metro 東西線","地下道轉乘，直達西葛西",[D('東京駅','西葛西駅'),M('Grand Hostel LDK Nishikasai')]]
+  ]},
+{ day:9, date:"11/8 (週日)", title:"西葛西半日遊 ➔ 成田機場 ✈️ 台灣",
+  hotel:{n:"當天返台", r:"UA837 成田 17:50 ➔ 高雄 21:25（約 4 小時 35 分）", a:""},
+  rows:[
+   ["上午","三選一：清澄白河藍瓶咖啡｜築地場外市場｜葛西臨海公園","東西線約 10 分鐘（清澄白河 / 門前仲町）","14:00 前返回西葛西取行李",[M('清澄白河 Blue Bottle Coffee'),M('築地場外市場'),M('葛西臨海公園')],"free"],
+   ["14:00","西葛西取行李 ➔ 成田機場","東西線 + 京成 / JR","建議 15:00~15:30 前抵達成田辦理登機",[D('西葛西駅','成田空港')]],
+   ["17:50 ➔ 21:25","成田 NRT ➔ 高雄 KHH","聯合航空 UA837","返家 ✈️",[]]
+  ]}
+];
+
+const tickets = [
+ ["Day 2 新幹線（上野 ➔ 長野）","11/1 06:22 發車（Kagayaki 501 號）","Klook 訂單號：KQE870934<br>取票碼：31362365217521218"],
+ ["Day 6 上高地去程巴士","11/5 07:10 新島々 ➔ 大正池","Alpico 予約番号：10212001481 (02号車)"],
+ ["Day 6 上高地回程巴士","11/5 17:15 上高地 ➔ 松本","Alpico 予約番号：10282000821 (01号車, JPY 3,810)"],
+ ["Day 7 長野站行李寄放 (MIDORI 1F)","11/6 08:30 寄放 / 17:00 領取","預約號 e4446592<br>⚠️ 免費取消/變更期限：11/5 23:59 前"]
+];
+const hotels = [
+ ["10/31 (1晚)","Hotel Graphy Nezu (根津)","Agoda: 1783130883"],
+ ["11/1 - 11/3 (3晚)","信州八方溫泉 白馬溫泉旅館","樂天 ID: 21315099394939 ($8,600含早)"],
+ ["11/4 - 11/5 (2晚)","東橫 INN 松本站東口","Booking.com 預訂"],
+ ["11/6 (1晚)","ホテル亀屋本店 (千曲上山田溫泉)","一休 予約番号: IC1708267979 (一泊二食)"],
+ ["11/7 (1晚)","Grand Hostel LDK Nishikasai (西葛西)","Booking.com 預訂"]
+];
+const foodData = [
+ ["Day 2 (白馬)","蕎麥處 整理 (Sobadokoro Ginri)","手打十割蕎麥麵名店"],
+ ["Day 2 (白馬)","深山 (Miyama)","黑豬肉醬汁炸豬排蓋飯、信州和牛定食"],
+ ["Day 2 (白馬)","餐廳 繪夢 (Emu)","家庭式居酒屋、大阪燒、自製漢堡排"],
+ ["Day 2 (白馬)","蕎麥酒房 廚 (Kuriya)","割烹居酒屋與和牛料理"],
+ ["Day 4 (青木湖)","ao LAKESIDE CAFE","湖畔咖啡"],
+ ["Day 5 (松本)","Hikariya","百年藏造建築餐廳，極具情調"],
+ ["Day 6 (松本)","Miyasaka 山賊燒","巨大酥脆多汁炸雞排「山賊燒」"],
+ ["Day 7 (戶隱)","戶隱蕎麥 渦屋 (Uzuraya)","手打竹籠蕎麥麵與現磨山葵"],
+ ["Day 7 (千曲)","ホテル亀屋本店 會席料理","18:00 一泊二食溫泉會席"]
+];
+
+const lk = (t,u) => `<a class="lk" href="${u}" target="_blank" rel="noopener">${t}</a>`;
+
+function switchTab(id){
+  ['itinerary','tickets','food','expenses','checklist'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.add('hidden');
+    document.getElementById('btn-'+t).classList.remove('tab-active');
+  });
+  document.getElementById('tab-'+id).classList.remove('hidden');
+  document.getElementById('btn-'+id).classList.add('tab-active');
+}
+
+function buildFilters(){
+  const on="px-3 py-1.5 rounded-md text-xs font-semibold bg-[#2D4A3E] text-white whitespace-nowrap";
+  window._fOn=on;
+  window._fOff="px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-[#2D4A3E] border border-[#EAE5D9] whitespace-nowrap";
+  let h=`<button id="filter-all" onclick="filterDay('all')" class="${on}">全部行程</button>`;
+  days.forEach(d=>{ h+=`<button id="filter-d${d.day}" onclick="filterDay(${d.day})" class="${window._fOff}">Day ${d.day}</button>`; });
+  document.getElementById('day-filters').innerHTML=h;
+}
+
+function filterDay(day){
+  document.getElementById('filter-all').className = day==='all'?window._fOn:window._fOff;
+  days.forEach(d=>{ document.getElementById('filter-d'+d.day).className = d.day===day?window._fOn:window._fOff; });
+  const list = day==='all'?days:days.filter(d=>d.day===day);
+  document.getElementById('itinerary-cards').innerHTML = list.map(d=>`
+    <div class="card-bg p-4 rounded-xl shadow-sm space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs bg-[#2D4A3E] text-white px-2 py-0.5 rounded font-bold">Day ${d.day}</span>
+        <span class="text-xs text-gray-500 font-semibold">${d.date}</span>
+      </div>
+      <h3 class="font-bold text-base text-[#2D4A3E]">${d.title}</h3>
+      <div class="bg-[#F3F7F4] rounded-lg p-2 text-xs">
+        🏨 <b>${d.hotel.n}</b><br><span class="text-gray-600">${d.hotel.r}${d.hotel.a?'｜'+d.hotel.a:''}</span>
+        ${d.hotel.a?'<br>'+lk(...M(d.hotel.n.split(' (')[0].split('（')[0])):''}
+      </div>
+      <div class="tl">
+        ${d.rows.map(r=>`
+          <div class="row ${r[5]||''}">
+            <div class="text-xs font-bold text-[#2D4A3E]">${r[0]}</div>
+            <div class="text-sm font-semibold">${r[1]}</div>
+            ${r[2]?`<div class="text-xs text-gray-700">🚌 ${r[2]}</div>`:''}
+            ${r[3]?`<div class="text-xs text-gray-500">${r[3]}</div>`:''}
+            <div class="mt-0.5">${(r[4]||[]).map(x=>lk(x[0],x[1])).join('')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function loadTickets(){
+  document.getElementById('ticket-list').innerHTML = tickets.map(t=>`
+    <div class="card-bg p-4 rounded-xl shadow-sm">
+      <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded font-semibold">已訂妥</span>
+      <h3 class="font-bold text-base mt-2">${t[0]}</h3>
+      <p class="text-sm text-gray-600 mt-1">${t[1]}</p>
+      <p class="text-xs bg-gray-50 p-2 rounded mt-2 font-mono">${t[2]}</p>
+    </div>`).join('');
+  document.getElementById('hotel-list').innerHTML = hotels.map(h=>`
+    <div class="card-bg p-4 rounded-xl shadow-sm">
+      <p class="text-xs text-gray-500">${h[0]}</p>
+      <h4 class="font-bold">${h[1]}</h4>
+      <p class="text-xs text-gray-600 mt-1">${h[2]}</p>
+      <div class="mt-1">${lk(...M(h[1]))}</div>
+    </div>`).join('');
+}
+
+function loadFood(){
+  document.getElementById('food-list').innerHTML = foodData.map(f=>`
+    <div class="card-bg p-4 rounded-xl shadow-sm">
+      <h4 class="font-bold text-sm text-[#2D4A3E]">${f[1]}</h4>
+      <p class="text-xs text-gray-500 mt-1">${f[0]}</p>
+      <p class="text-xs text-gray-700 mt-1">${f[2]}</p>
+      <div class="mt-1">${lk(...M(f[1]))}</div>
+    </div>`).join('');
+}
+
+function convertCurrency(type){
+  const j=document.getElementById('calc-jpy'), t=document.getElementById('calc-twd');
+  if(type==='jpy') t.value=((parseFloat(j.value)||0)*currentRate).toFixed(2);
+  else j.value=((parseFloat(t.value)||0)/currentRate).toFixed(0);
+}
+
+function addExpense(){
+  const title=document.getElementById('exp-title').value;
+  const amount=parseFloat(document.getElementById('exp-amount').value);
+  const category=document.getElementById('exp-category').value;
+  if(!title||isNaN(amount)){ alert('請填寫完整的項目與金額'); return; }
+  expenses.push({title,amount,category,date:new Date().toLocaleDateString()});
+  save();
+  document.getElementById('exp-title').value='';
+  document.getElementById('exp-amount').value='';
+  renderExpenses();
+}
+function deleteExpense(i){ expenses.splice(i,1); save(); renderExpenses(); }
+
+function renderExpenses(){
+  let total=0;
+  document.getElementById('expense-list').innerHTML = expenses.map((e,i)=>{
+    total+=e.amount;
+    return `<div class="flex justify-between items-center py-2 text-sm">
+      <div><p class="font-bold">${e.title}</p><p class="text-xs text-gray-400">${e.category} · ${e.date}</p></div>
+      <div class="flex items-center space-x-3"><span class="font-bold text-[#2D4A3E]">¥${e.amount.toLocaleString()}</span>
+      <button onclick="deleteExpense(${i})" class="text-xs text-red-500">刪除</button></div></div>`;
+  }).join('');
+  document.getElementById('total-spent').innerText=`¥${total.toLocaleString()} (NT$${Math.round(total*currentRate).toLocaleString()})`;
+}
+
+window.onload=function(){ buildFilters(); filterDay('all'); loadTickets(); loadFood(); renderExpenses(); };
+</script>
+</body>
+</html>
